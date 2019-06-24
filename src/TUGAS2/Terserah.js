@@ -1,0 +1,1 @@
+exports.ApalahArtiSebuahNama = `http://172.16.30.116:8000`
