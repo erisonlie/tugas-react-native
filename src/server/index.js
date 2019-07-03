@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql')
 var bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+const secretKey = 'markLee';
 
 app.use((req, res, next)=>{
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -59,6 +61,14 @@ app.get('/movie/:id_movie/review', (req, res)=>{
     })
 })
 
+app.get('/movie/:id_movie/review/count', (req, res)=>{
+    var id_movie = req.params.id_movie
+    conn.query("SELECT `rating`, count(`rating`) as count FROM `review` where `id_movie` = " + id_movie + " GROUP BY `rating` UNION ALL SELECT 'ALL' `rating`, count(`rating`) from `review` where `id_movie` = " + id_movie, (err, rows)=>{
+        res.json(rows)
+        console.log(rows)
+    })
+})
+
 app.get('/movie/:id_movie/review/:star', (req, res)=>{
     var id_movie = req.params.id_movie
     var star = req.params.star
@@ -68,6 +78,74 @@ app.get('/movie/:id_movie/review/:star', (req, res)=>{
         console.log(rows)
     })
 })
+
+app.get('/search/:criteria', (req, res)=>{
+    var criteria = req.params.criteria
+    conn.query("SELECT * FROM `movies` WHERE `title` LIKE '%" + criteria + "%'", (err, rows)=>{
+        res.json(rows)
+        // console.log(criteria)
+        // console.log(rows)
+    })
+})
+
+app.post('/login', (req, res)=> {
+    conn.query(`SELECT * FROM user WHERE email_address = '${req.body.email_address}' AND password = '${req.body.password}'`, (err, rows)=> {
+        console.log('a')
+        console.log(rows)
+        if(rows.length > 0) {
+            console.log('b')
+            const payload = {
+                email_address : rows[0].email_address,
+                id : rows[0].id_user
+            }
+
+            const token = jwt.sign(payload, secretKey, {expiresIn :'1d'})
+            console.log({
+                id : rows[0].id_user,
+                token : token
+            })
+            res.json({
+                id : rows[0].id_user,
+                token : token
+            })
+        } else {
+            console.log('c')
+            res.status(400).json({message: 'Email atau password salah'})
+        }
+    })
+})
+
+app.post('/register', (req, res)=>{
+    console.log('Masuk')
+    var data = ({
+        username : req.body.username,
+        email_address : req.body.email_address,
+        password : req.body.password
+    })
+
+    conn.query("INSERT INTO user SET ?", data, (err, result)=>{
+        const payload = {
+            id : rows.insertId,
+            email : data.email_address
+        }
+
+        const token = jwt.sign(payload, secretKey, {expiresIn:'1d'})
+
+        if(err) {res.status(500).json(err)}
+        else {res.status(200).json({token : token})}
+    })
+})
+
+exports.auth = (req, res, next)=> {
+    try {
+        const token = req.headers.authorization.split(" ")[1];
+        req.userData = jwt.verify(token, secretKey);
+        next()
+    } catch {
+        console.log(err);
+        return res.status(401).json({message: 'JWT Token is invalid.'})
+    }
+}
 
 const server = http.createServer(app);
 server.listen(8000, ()=>{

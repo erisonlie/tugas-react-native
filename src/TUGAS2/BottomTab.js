@@ -1,14 +1,15 @@
 import React from "react";
-import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation';
-import { StyleSheet, View, Text } from 'react-native'
+import { createStackNavigator, createAppContainer, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
 import HomeComponent from './Home.js';
-import DashboardComponent from './Dashboard.js';
+import SearchComponent from './Search.js';
 import AccountComponent from './Account.js';
 import LoginComponent from './Login.js';
 import Register from './Register.js';
+import Settings from './Settings';
 import DetailFilmComponent from './DetailFilmComponent.js';
-import ReviewComponent from './ReviewComponent.js';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import ReviewComponent from './ReviewComponent';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import SplashScreen from './Splash'
 
 const HomeStack = createStackNavigator({
     HomeRoot : {
@@ -22,9 +23,18 @@ const HomeStack = createStackNavigator({
     }
 })
 
-const DashboardStack = createStackNavigator({
-    DashboardRoot : {
-        screen: DashboardComponent
+const SearchStack = createStackNavigator({
+    SearchRoot : {
+        screen: SearchComponent
+    }
+})
+
+const ProfileStack = createStackNavigator({
+    Profile : {
+        screen: AccountComponent
+    },
+    Settings : {
+        screen : Settings
     }
 })
 
@@ -33,11 +43,22 @@ const AccountStack = createStackNavigator({
         screen: LoginComponent
     },
     Register : {
-        screen: Register
+        screen : Register
+    }
+})
+
+const AccountSwitch = createSwitchNavigator({
+    Splash : {
+        screen : SplashScreen   
     },
-    Account : {
-        screen: AccountComponent
+    AccountStack : {
+        screen : AccountStack
     },
+    ProfileStack : {
+        screen : ProfileStack
+    },
+}, {
+    initialRouteName : 'Splash'
 })
 
 const BottomTab = createBottomTabNavigator({
@@ -45,35 +66,36 @@ const BottomTab = createBottomTabNavigator({
         screen: HomeStack,
         navigationOptions: {
             tabBarIcon: ({tintColor})=> (
-                <Ionicons name="md-home" color={tintColor} size={35}/>
+                <Ionicons name="md-home" color={tintColor} size={30}/>
             )
         }
     },
-    DashboardTab: {
-        screen: DashboardStack,
+    SearchTab: {
+        screen: SearchStack,
         navigationOptions: {
             tabBarIcon: ({tintColor})=> (
-                <Ionicons name="md-notifications" color={tintColor} size={35}/>
+                <Ionicons name="md-search" color={tintColor} size={30}/>
             )
         }
     },
     AccountTab: {
-        screen: AccountStack,
+        screen: AccountSwitch,
         navigationOptions: {
             tabBarIcon: ({tintColor})=> (
-                <Ionicons name="md-person" color={tintColor} size={35}/>
+                <Ionicons name="md-person" color={tintColor} size={30}/>
             )
         }
     }
 }, {
     tabBarOptions: {
-        activeTintColor: 'rgb(153,0,26)',
-        inactiveTintColor: 'rgba(0,0,0,.5)',
+        activeTintColor: '#38908f',
+        inactiveTintColor: 'rgba(255,255,255,.4)',
         style : {
-            borderTopColor: 'rgb(255,179,230)',
+            borderTopColor: '#38908f',
+            borderTopWidth: 1,
             shadowColor: 'black',
-            backgroundColor: 'rgb(255,204,246)',
-            height: 45,
+            backgroundColor: 'black',
+            height: 50,
             paddingBottom: 2,
         },
         showLabel: false

@@ -1,14 +1,79 @@
 import React from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native'
+import {StyleSheet, View, Text, TextInput, TouchableOpacity, AsyncStorage, TouchableWithoutFeedback, Keyboard} from 'react-native'
+import Address from './Terserah';
+
+export default class Login extends React.Component {
+    static navigationOptions = {
+        header : null
+    }
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            email_address: '',
+            password: '',
+        }
+    }
+
+    loginHandler() {
+        console.warn('Log')
+        fetch(`${Address.ApalahArtiSebuahNama}/login`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email_address: this.state.email_address,
+                password: this.state.password
+            })
+        })
+        .then(response => {
+            response.json().then(
+                res => {
+                    console.warn(res);
+                    AsyncStorage.setItem('token', res.token);
+                    AsyncStorage.setItem('id', res.id);
+                    this.props.navigation.navigate('HomeStack')
+                }
+            )
+        })
+        // .then(response => response.json())
+        // .then(res => {
+        //     AsyncStorage.setItem('token', JSON.stringify(res));
+        // })
+        .catch(err => {
+            alert('There is problem while fetching.');
+            console.log(err)
+        })
+    }
+
+    render() {
+        return (
+            <TouchableWithoutFeedback onPress={()=> {Keyboard.dismiss()}}>
+            <View style={{alignItems: 'center', flex: 1, justifyContent: 'center', backgroundColor: 'black'}}>
+                <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white', width:'100%', textAlign:'center'}}>Login</Text>
+ 
+                <TextInput onChangeText={value => {this.setState({email_address: value})}} style={styles.input} placeholder="Email" placeholderTextColor='rgba(0,0,0,.5)' value={this.state.email_address}/>
+                <TextInput onChangeText={value => {this.setState({password: value})}} secureTextEntry style={styles.input} placeholder="Password" placeholderTextColor='rgba(0,0,0,.5)' value={this.state.password}/>
+
+                <TouchableOpacity style={styles.button} onPress={()=> this.loginHandler()}><Text style={{color: 'white'}}>Login</Text></TouchableOpacity>
+                <Text style={{color:'white'}}>Not a member? <Text style={{color : '#38908f'}} onPress={()=> this.props.navigation.navigate('Register')}>Register now!</Text></Text>
+            </View>
+            </TouchableWithoutFeedback>
+        )
+    }
+}
 
 const styles = StyleSheet.create({
     input : {
         width : 270,
         height : 30,
         fontSize: 12,
-        backgroundColor : '#f0c5d5',
+        backgroundColor : 'white',
         borderRadius : 20,
-        marginTop : 20
+        marginTop : 20,
+        padding : 5
     },
     button : {
         width : 270,
@@ -20,27 +85,3 @@ const styles = StyleSheet.create({
         paddingTop : 10
     }
 })
-
-export default class Login extends React.Component {
-    static navigationOptions = {
-        title : 'Login',
-        headerStyle : {
-            backgroundColor : '#d2a3a9'
-        },
-        headerTintColor : 'white'
-    }
-
-    render() {
-        return (
-            <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
-                <Text style={{fontSize: 20, color: '#38908f'}}>Login</Text>
- 
-                <TextInput style={styles.input} placeholder="Username" placeholderTextColor='white'></TextInput>
-                <TextInput style={styles.input} placeholder="Password" placeholderTextColor="white" secureTextEntry></TextInput>
-
-                <TouchableOpacity style={styles.button} onPress={()=> this.props.navigation.navigate('Account')}><Text style={{color : 'white'}}>Login</Text></TouchableOpacity>
-                <Text>Not a member? <Text style={{color : '#38908f'}} onPress={()=> this.props.navigation.navigate('Register')}>Register now!</Text></Text>
-            </View>
-        )
-    }
-}

@@ -1,7 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image, ImageBackground } from 'react-native'
-import {Button} from 'react-native-elements';
-import { ScrollView } from 'react-native-gesture-handler';
+import { StyleSheet, View, Text, Image, AsyncStorage, TextInput, Button} from 'react-native'
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 export default class Account extends React.Component {
@@ -50,6 +49,10 @@ export default class Account extends React.Component {
         }
     }
 
+    setModalVisible(visible) {
+        this.setState({modalVisible: visible});
+      }    
+
     resizePoster = (event, index) => {
         let widthOrigin = event.nativeEvent.source.width
         let heightOrigin = event.nativeEvent.source.height
@@ -63,46 +66,29 @@ export default class Account extends React.Component {
     }
 
     static navigationOptions = {
-        title : 'Profile',
-        headerStyle : {
-            backgroundColor : '#d2a3a9',
-        },
-        headerLeft: null,
-        headerTintColor : 'white'
-    }
-
-    renderSection = () =>{
-        if(this.state.activeIndex == 0) {
-            return(
-                <View>
-                    <Text>First section</Text>
-                </View>
-            )
-        }
-        else{
-            return(
-                <View>
-                    <Text>reviews section</Text>
-                </View>
-            )
-        }
+        header : null,
+        // title : 'Profile',
+        // headerStyle : {
+        //     backgroundColor : '#38908f',
+        // },
+        // headerTintColor : 'white'
     }
 
     render() {
         return (
-            <ScrollView>
+            <View style={{backgroundColor:'black'}}>
                 <View style={styles.profile}>
-                    <ImageBackground style={{width: '100%', height: 250, justifyContent: 'center', alignItems:'center'}} source={require('./assets/TUGAS2/download.jpg')}>
-                        <Ionicons name="md-settings" color='black' size={24} style={{alignSelf:'flex-end', marginRight: 20, marginBottom : 90}}/>
-                        <Text style={{fontSize:24, color:'black'}}>username</Text>
-                        <Text style={styles.emailtext}>email@email.com</Text>
-                        <Text style={styles.desctext}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
-                    </ImageBackground>
+                    <Ionicons name="md-settings" color='white' size={20} style={{alignSelf:'flex-end', marginRight:20}} onPress={()=> this.props.navigation.push('Settings')}/>
+                    <Image style={{width: 80, height:80, justifyContent: 'center', alignItems:'center', borderRadius:40}} source={require('./assets/TUGAS2/download.jpg')} />
+                    <Text style={{fontSize:18, fontWeight:'bold', color:'white', fontFamily:'Arial'}}>username</Text>
+                    <Text style={styles.emailtext}>email@email.com</Text>
+                    <Text style={styles.desctext}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</Text>
                 </View>
 
                 <View>
+                    <Text style={styles.sectionName}>All Reviews</Text>
                 {this.state.listfilms.map((item, index) => (
-                    <View key={index} style={{ paddingHorizontal: 15, paddingVertical: 20, marginBottom: 15, backgroundColor: '#fdcf76' }}>
+                    <ScrollView key={index} style={{ paddingHorizontal: 15, paddingVertical: 20, marginBottom: 15,}}>
                         <View style={{ flexDirection: 'row' }}>
                             <Image
                                 onLoad={(event) => this.resizePoster(event, index)}
@@ -114,7 +100,7 @@ export default class Account extends React.Component {
                                     <View style={{ flexDirection: 'column', flex: 1, marginRight: 15}}>
                                         <Text style={{ backgroundColor: '#b16e4b', paddingVertical: 3, paddingHorizontal: 8, alignSelf: 'flex-start', fontWeight: 'bold', fontSize: 10, color: 'white', marginBottom: 3 }}>SEPT 23, 2018</Text>
 
-                                        <Text style={{ flex: 1, flexWrap: 'wrap', fontWeight: 'bold', fontStyle: 'italic', fontSize: 16 }}>{item.title}</Text>
+                                        <Text style={{ flex: 1, flexWrap: 'wrap', fontWeight: 'bold', fontStyle: 'italic', fontSize: 16, color:'white'}}>{item.title}</Text>
 
                                     </View>
 
@@ -124,68 +110,38 @@ export default class Account extends React.Component {
                                 </View>
 
                                 <View>
-                                    <Text style={{fontSize: 13}}>The Oscar-Winning Actress is getting Oscar-buzz for her upcoming in the adaptation Bad Blood</Text>
+                                    <Text style={{fontSize: 13, color:'white'}}>The Oscar-Winning Actress is getting Oscar-buzz for her upcoming in the adaptation Bad Blood</Text>
                                 </View>
                             </View>
                         </View>
-                    </View>
-                ))}
-            </View>
-                {/* <View style={styles.reviews}>
-                    <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-                        <Text style={{color:'maroon', fontSize: 20}}>Reviews</Text>
-                        <Text style={{color: 'maroon', borderLeftColor:'maroon', borderLeftWidth:1.5, paddingLeft:10}}>Write a Review <Ionicons name="md-create" color="maroon" size={20}/></Text>
-                    </View>
-                    <View style={styles.blackline}></View>
-                    <View>
-                        <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-                            <Text>Movie's Title <Text>(20xx)</Text></Text>
-                            <Text>8/10</Text>
-                        </View>
-                        <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-                            <View style={{width:50, height:80, backgroundColor:'black', marginRight:10}}></View>
-                            <Text style={{width: 250, height:100, fontSize:10}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text>
-                        </View>
-                        <View style={styles.blackline}></View>
-                    </View>
-                </View> */}
-
-                {/* <View>
-                    <View style={{flexDirection:'row', justifyContent:'space-evenly', }}>
-                        <Button type="clear" title="Ratings" onPress={()=>this.setState({activeIndex:0})} isActive={this.state.activeIndex == 0}  />
-                        <View style={{borderLeftColor:'black', borderLeftWidth:1}}></View>
-                        <Button type="clear" title="Reviews" onPress={()=>this.setState({activeIndex:1})} isActive={this.state.activeIndex == 1} />
-                    </View>
-
-                    <ScrollView>
-                    {this.renderSection()}
                     </ScrollView>
-                </View> */}
-
-            </ScrollView>
+                ))}
+                </View>
+            </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
     profile: {
-        backgroundColor: 'white',
+        backgroundColor: 'rgba(255,255,255,.1)',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 20,
-        height: 250,
-        paddingBottom: 20,
+        paddingVertical: 20
     },
     emailtext : {
         fontSize : 12,
-        color : 'black',
-        fontStyle : 'italic'
+        color : 'rgba(255,255,255,.8)',
+        fontStyle : 'italic',
+        fontFamily: 'Arial'
     },
     desctext : {
         fontSize: 10,
-        color : 'black',
+        color : 'rgba(255,255,255,.8)',
         marginHorizontal : 15,
-        marginTop : 10
+        marginTop : 10,
+        textAlign : 'center',
+        fontFamily: 'Arial'
     },
     reviews : {
         marginTop : 20,
@@ -193,5 +149,15 @@ const styles = StyleSheet.create({
         width : 340,
         padding : 15,
         borderRadius: 5
-    }
+    },
+    sectionName : {
+        fontFamily: 'Arial',
+        fontWeight: 'bold',
+        fontSize: 15,
+        textAlign: 'center',
+        marginBottom: 10,
+        marginTop: 20,
+        color:'white',
+    },
+
 });

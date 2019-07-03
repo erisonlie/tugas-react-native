@@ -2,72 +2,81 @@ import React from 'react';
 import { StyleSheet, View, Text, Image, Dimensions } from 'react-native'
 import ReadMore from 'react-native-read-more-text';
 import { ScrollView, TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Stars from 'react-native-stars-rating';
+import BackEndAddress from './Terserah';
 
 export default class ReviewComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            ratingStars: ['ALL', 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1],
+            ratingStars: [
+                {rate: 'ALL', count: 0},
+                {rate: 5, count: 0},
+                {rate: 4.5, count: 0},
+                {rate: 4, count: 0},
+                {rate: 3.5, count: 0},
+                {rate: 3, count: 0},
+                {rate: 2.5, count: 0},
+                {rate: 2, count: 0},
+                {rate: 1.5, count: 0},
+                {rate: 1, count: 0}
+            ],
+            reviewCount: [],
             reviewFilter: [],
-            numberHolder: 1
+            numberHolder: 1,
+            testajah: ''
         };
+    }
+
+    assignReviewCount(idmovie) {
+        fetch(`${BackEndAddress.ApalahArtiSebuahNama}/movie/${idmovie}/review/count`)
+            .then(response => response.json())
+            .then(res => {
+                let items = JSON.parse(JSON.stringify(this.state.ratingStars))
+                for (i = 0; i < this.state.ratingStars.length; i++) {
+                    for (j = 0; j < res.length; j++) {
+                        if (this.state.ratingStars[i].rate == res[j].rating) {
+                            items[i].count = res[j].count
+                        }
+                    }
+                }
+                this.setState({ratingStars : items})
+            })
+            .catch(error => {
+                console.log(error)
+            })
     }
 
     _renderTruncatedFooter = (handlePress) => {
         return (
-            <Text style={{ fontSize: 12, color: 'navy' }} onPress={handlePress}>Read more</Text>
+            <Text style={styles.readMoreShowLess} onPress={handlePress}>Read more</Text>
         )
     }
 
     _renderRevealedFooter = (handlePress) => {
         return (
-            <Text style={{ fontSize: 12, color: 'navy' }} onPress={handlePress}>Show less</Text>
+            <Text style={styles.readMoreShowLess} onPress={handlePress}>Show less</Text>
         )
     }
-
-    _handleTextReady = () => {
-        console.log('ready!');
-    }
-
+    
     static navigationOptions = {
-        title: 'Review',
+        title: 'Reviews',
         headerStyle: {
-            backgroundColor: '#d2a3a9',
+            backgroundColor: '#38908f',
         },
-        headerLeft: null,
         headerTintColor: 'white'
-    }
-
-    howManyStars(number) {
-        var staricons = [];
-        for (let i = 0; i < Math.floor(number); i++) {
-            staricons.push(
-                <View key={i}>
-                    <Ionicons name="md-star" size={15} />
-                </View>
-            )
-        }
-        if (number == Math.floor(number)) {
-            return staricons
-        } else {
-            staricons.push(
-                <View key={staricons.length + 1}>
-                    <Ionicons name="md-star-half" size={15} />
-                </View>
-            )
-            return staricons
-        }
     }
 
     componentDidMount() {
         this.fetchReview(this.props.navigation.getParam('id_movie'), '')
+        this.assignReviewCount(this.props.navigation.getParam('id_movie'))
     }
 
     fetchReview(idmovie, star) {
         var randomNumber = Math.floor(Math.random() * 50) + 1;
-      
-        fetch('http://192.168.43.174:8000/movie/' + idmovie + '/review' + star)
+        
+        fetch(`${BackEndAddress.ApalahArtiSebuahNama}/movie/${idmovie}/review${star}`)
             .then(response => response.json())
             .then(res => {
                 this.setState({
@@ -94,45 +103,61 @@ export default class ReviewComponent extends React.Component {
 
     render() {
         return (
-            <ScrollView>
+            <ScrollView style={{backgroundColor:'black'}}>
                 <View>
-                    <ScrollView showsHorizontalScrollIndicator={false} horizontal style={{ flexDirection: 'row', paddingVertical: 15, marginBottom: 10 }}>
+                    <ScrollView showsHorizontalScrollIndicator={false} horizontal style={styles.scrollViewButton}>
                         <View style={{ paddingLeft: 10 }}></View>
                         {this.state.ratingStars.map((item, index) => (
-                            <TouchableOpacity key={index} style={styles.borderButtonRating} onPress={() => this.fetchReview(this.props.navigation.getParam('id_movie'), item === 'ALL' ? '' : '/' + item )}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text style={styles.textButtonRating}>{item}</Text>
-                                    {item === 'ALL' ? <Text></Text> : <Ionicons name="md-star" size={18} /> }
+                            <TouchableOpacity key={index} style={styles.borderButtonRating} onPress={() => this.fetchReview(this.props.navigation.getParam('id_movie'), item.rate === 'ALL' ? '' : '/' + item.rate )}>
+                                <View style={{flexDirection: 'column', alignItems: 'center'}}>
+                                    <View style={styles.containerStarRating}>
+                                        <Text style={styles.textButtonRating}>{item.rate}</Text>
+                                        {item.rate === 'ALL' ? <Text></Text> : <Ionicons name="md-star" size={18} color='#38908f'/> }
+                                    </View>
+                                    {item.count == 0 ? <Text style={styles.textReviewCount}>0</Text> : <Text style={styles.textReviewCount}>{item.count}</Text>}
                                 </View>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
-
-                        {this.state.reviewFilter.map((item, index) => (
-                            <View key={index + this.state.numberHolder} style={{ paddingHorizontal: 20 }}>
-                                <View style={{ borderBottomColor: 'rgba(0,0,0,.2)', borderBottomWidth: 1, paddingBottom: 6, marginBottom: 5 }}>
-                                    <Text style={{ fontWeight: 'bold', fontSize: 13 }}>
-                                        {item.review_title}
+                    
+                    {!this.state.reviewFilter || !this.state.reviewFilter.length ?
+                        <View style={{paddingHorizontal: 20}}>
+                            <Text style={{textAlign: 'center'}}>No reviews with the specified rating has been posted by our users yet.</Text>
+                        </View>
+                    : 
+                    this.state.reviewFilter.map((item, index) => (
+                        <View key={index + this.state.numberHolder} style={styles.reviewContainer}>
+                            <View style={styles.reviewTitleContainer}>
+                                <Text style={{ fontWeight: 'bold', fontSize: 13, color: 'white' }}>
+                                    {item.review_title}
+                                </Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Stars
+                                        isActive={false}
+                                        rateMax={5}
+                                        rate={item.rating}
+                                        size={15}
+                                        isHalfStarEnabled={true}
+                                        color='#38908f'
+                                    />
+                                    <Text style={styles.reviewWriterandDate}>
+                                        {item.username} on {this.dateFormatter(item.date_added)}
                                     </Text>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        {this.howManyStars(item.rating)}
-                                        <Text style={{ flexDirection: 'row', fontSize: 12, paddingLeft: 8, marginLeft: 7, borderLeftColor: 'rgba(0,0,0,.5)', borderLeftWidth: 1 }}>
-                                            {item.username} on {this.dateFormatter(item.date_added)}
-                                        </Text>
-                                    </View>
                                 </View>
-
-                                <ReadMore
-                                    numberOfLines={3}
-                                    renderTruncatedFooter={this._renderTruncatedFooter}
-                                    renderRevealedFooter={this._renderRevealedFooter}
-                                    onReady={this._handleTextReady}>
-                                    <Text style={{ fontSize: 12 }}>
-                                        {item.review}
-                                    </Text>
-                                </ReadMore>
                             </View>
-                        ))}
+
+                            <ReadMore
+                                numberOfLines={3}
+                                renderTruncatedFooter={this._renderTruncatedFooter}
+                                renderRevealedFooter={this._renderRevealedFooter}>
+                                <Text style={{ fontSize: 12, color: 'white' }}>
+                                    {item.review}
+                                </Text>
+                            </ReadMore>
+                        </View>
+                    ))
+                        
+                    }
                 </View>
             </ScrollView>
         )
@@ -143,7 +168,7 @@ const styles = StyleSheet.create({
     borderButtonRating: {
         borderWidth: 2,
         borderRadius: 10,
-        borderColor: 'rgba(0,0,0,.5)',
+        borderColor: 'white',
         paddingHorizontal: 10,
         paddingVertical: 5,
         alignItems: 'center',
@@ -153,6 +178,54 @@ const styles = StyleSheet.create({
     textButtonRating: {
         fontSize: 20,
         fontWeight: 'bold',
-        paddingRight: 2
-    }
+        paddingRight: 2,
+        color:'white'
+    },
+    containerStarRating: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingBottom: 3,
+        borderBottomWidth: 1,
+        borderBottomColor: 'white'
+    },
+    readMoreShowLess: {
+        fontSize: 12,
+        color: '#38908f',
+        fontWeight: 'bold',
+        paddingTop:5
+    },
+    reviewWriterandDate: {
+        flexDirection: 'row',
+        fontSize: 12,
+        paddingLeft: 8,
+        marginLeft: 7,
+        borderLeftColor: 'white',
+        borderLeftWidth: 1,
+        color: 'white'
+    },
+    reviewTitleContainer: {
+        borderBottomColor: 'white',
+        borderBottomWidth: 1,
+        paddingBottom: 6,
+        marginBottom: 5
+    },
+    reviewContainer: {
+        marginBottom: 15,
+        marginHorizontal: 13,
+        paddingHorizontal: 13,
+        paddingVertical: 10,
+        borderRadius: 10,
+        backgroundColor: 'rgba(0,0,0,.8)'
+    },
+    scrollViewButton: {
+        flexDirection: 'row',
+        paddingVertical: 15,
+        marginBottom: 10,
+        backgroundColor:'rgba(255,255,255,.3)'
+    },
+    textReviewCount: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color:'white'
+    },
 });
