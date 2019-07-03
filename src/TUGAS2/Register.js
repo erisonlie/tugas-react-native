@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard} from 'react-native'
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, AsyncStorage} from 'react-native'
 import Address from './Terserah';
 
 const styles = StyleSheet.create({
@@ -57,18 +57,11 @@ export default class Register extends React.Component {
                     password : this.state.password
                 })
             })
-            .then(
-                response => {
-                    if(response.ok) {
-                        response.json().then(
-                            res => {
-                                AsyncStorage.setItem('token', res.token);
-                                this.props.navigation.navigate('HomeStack');
-                            }
-                        )
-                    }
-                }
-            )
+            .then(res => {
+                AsyncStorage.setItem('token', res.token);
+                AsyncStorage.setItem('id', res.id);
+                this.props.navigation.navigate('ProfileStack')
+            })
             .catch(err => {
                 alert('There is problem while fetching.');
                 console.log(err)

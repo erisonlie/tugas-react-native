@@ -1,1 +1,1 @@
-exports.ApalahArtiSebuahNama = `http://192.168.100.102:8000`
+exports.ApalahArtiSebuahNama = `http://172.16.30.182:8000`

@@ -123,7 +123,7 @@ app.post('/register', (req, res)=>{
         password : req.body.password
     })
 
-    conn.query("INSERT INTO user SET ?", data, (err, result)=>{
+    conn.query("INSERT INTO user SET ?", data, (err, rows)=>{
         const payload = {
             id : rows.insertId,
             email : data.email_address
@@ -131,8 +131,10 @@ app.post('/register', (req, res)=>{
 
         const token = jwt.sign(payload, secretKey, {expiresIn:'1d'})
 
-        if(err) {res.status(500).json(err)}
-        else {res.status(200).json({token : token})}
+        res.json({
+            id : data.email_address,
+            token : token
+        })
     })
 })
 

@@ -19,6 +19,7 @@ export default class Settings extends React.Component{
 
     logOut() {
         AsyncStorage.removeItem('token')
+        AsyncStorage.removeItem('id')
         this.props.navigation.navigate('AccountStack')
     }
 

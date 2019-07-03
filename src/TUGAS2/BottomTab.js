@@ -9,7 +9,7 @@ import Settings from './Settings';
 import DetailFilmComponent from './DetailFilmComponent.js';
 import ReviewComponent from './ReviewComponent';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import SplashScreen from './Splash'
+import Loading from './Loading'
 
 const HomeStack = createStackNavigator({
     HomeRoot : {
@@ -48,8 +48,8 @@ const AccountStack = createStackNavigator({
 })
 
 const AccountSwitch = createSwitchNavigator({
-    Splash : {
-        screen : SplashScreen   
+    LoadingScreen : {
+        screen : Loading   
     },
     AccountStack : {
         screen : AccountStack
@@ -58,7 +58,7 @@ const AccountSwitch = createSwitchNavigator({
         screen : ProfileStack
     },
 }, {
-    initialRouteName : 'Splash'
+    initialRouteName : 'LoadingScreen'
 })
 
 const BottomTab = createBottomTabNavigator({

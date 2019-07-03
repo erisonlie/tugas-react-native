@@ -16,7 +16,6 @@ export default class Login extends React.Component {
     }
 
     loginHandler() {
-        console.warn('Log')
         fetch(`${Address.ApalahArtiSebuahNama}/login`, {
             method: 'POST',
             headers: {
@@ -31,17 +30,12 @@ export default class Login extends React.Component {
         .then(response => {
             response.json().then(
                 res => {
-                    console.warn(res);
                     AsyncStorage.setItem('token', res.token);
                     AsyncStorage.setItem('id', res.id);
-                    this.props.navigation.navigate('HomeStack')
+                    this.props.navigation.navigate('ProfileStack')
                 }
             )
         })
-        // .then(response => response.json())
-        // .then(res => {
-        //     AsyncStorage.setItem('token', JSON.stringify(res));
-        // })
         .catch(err => {
             alert('There is problem while fetching.');
             console.log(err)
